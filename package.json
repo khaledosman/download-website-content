@@ -1,0 +1,22 @@
+{
+  "name": "website-crawler",
+  "version": "1.0.0",
+  "description": "",
+  "main": "crawler.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cheerio": "^0.20.0",
+    "crawler": "^0.4.3",
+    "fs": "0.0.2",
+    "node-phantom": "^0.2.5",
+    "phantomjs": "^1.9.19",
+    "request": "^2.69.0",
+    "simplecrawler": "^0.6.0",
+    "socket.io": "^1.4.5",
+    "url": "^0.11.0"
+  }
+}
