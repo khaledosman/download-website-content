@@ -18,7 +18,7 @@ var c = new Crawler({
             var link = $(this);
             var href = link.attr("href");
             var src = link.attr('src');
-            // console.log('Image ->', src);
+            console.log('Image ->', src);
         });
 
         //text
@@ -26,7 +26,14 @@ var c = new Crawler({
             var link = $(this);
             var text = link.text().trim();
 
-            // console.log('Text ->', text);
+            console.log('Text ->', text);
+        });
+
+        $('text').each(function() {
+            var link = $(this);
+            var text = link.text().trim();
+            // textTags.push(text);
+            console.log('found text ->', text);
         });
 
         //links
@@ -34,13 +41,7 @@ var c = new Crawler({
             var link = $(this);
             var text = link.text().trim();
             var href = link.attr("href");
-            // console.log(text + " -> " + href);
-        });
-
-        $('g').children().each(function() {
-            var link = $(this);
-            var text = link.text().trim();
-            console.log('wat', text);
+            console.log(text + " -> " + href);
         });
     }
 });

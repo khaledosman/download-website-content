@@ -34,22 +34,31 @@ phantom.create(function(err, ph) {
                         backgroundImages = [];
 
                     $('h1, h2, h3, h4, h5, h6, tr, td, li, b, em, i, label, ol, option').each(function() {
-                        headings.push($(this).text().trim());
+                        var link = $(this);
+                        var text = link.text().trim();
+                        headings.push(text);
+                        // console.log('found heading ->', text);
                     });
 
                     $('p').each(function() {
-                        pTags.push($(this).text().trim());
+                        var link = $(this);
+                        var text = link.text().trim();
+                        pTags.push(text);
+                        // console.log('found p ->', p);
                     });
 
                     $('text').each(function() {
-                        textTags.push($(this).text().trim());
+                        var link = $(this);
+                        var text = link.text().trim();
+                        textTags.push(text);
+                        // console.log('found text ->', text);
                     });
 
                     $("img").each(function() {
                         var link = $(this);
                         var src = link.attr('src');
                         imageTags.push(src);
-                        // console.log('Image ->', src);
+                        // console.log('found Image ->', src);
                     });
 
                     $('a').each(function() {
@@ -57,7 +66,7 @@ phantom.create(function(err, ph) {
                         var text = link.text().trim();
                         var href = link.attr("href");
                         hyperLinks.push(href);
-                        // console.log(text + " -> " + href);
+                        // console.log('hyperlink:', text + " -> " + href);
                     });
 
                     $('*').each(function() {
@@ -65,12 +74,13 @@ phantom.create(function(err, ph) {
                         var style = link.css('backgroundImage');
                         if (style !== 'none') {
                             backgroundImages.push(style.substring(4, style.length - 1));
+                            // console.log('found backgroundImage', style.substring(4, style.length - 1));
                         }
                     });
 
 
                     return {
-                        h2: headings,
+                        headings: headings,
                         p: pTags,
                         text: textTags,
                         images: imageTags,
@@ -78,10 +88,12 @@ phantom.create(function(err, ph) {
                         backgroundImages: backgroundImages
                     };
                 }, function(err, result) {
+                    //create downlaods directory if it doesnt exist
                     if (!fs.existsSync(dir)) {
                         fs.mkdirSync(dir);
                     }
                     console.log(result);
+                    //download images and save them in downloads folder
                     result.backgroundImages.forEach(function(imageUrl) {
                         // console.log('imageUrl', imageUrl);
                         var splits = imageUrl.split('/');
@@ -91,6 +103,7 @@ phantom.create(function(err, ph) {
                             console.log('downloaded', imageName);
                         });
                     });
+
                 });
             }, 1000);
             // });
