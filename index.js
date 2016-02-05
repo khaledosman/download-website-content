@@ -22,7 +22,7 @@ function generateUrls() {
     var urls = [];
     var baseUrl = 'http://www.visualization.deftech.ch/?client=deftech&industry=0&distance=0&order=0&card=tech';
     // card=tech10001 ~ 10203
-    for (var i = 10001; i < 10203; i++) {
+    for (var i = 10001; i <= 10203; i++) {
         urls.push(baseUrl + i);
     }
     return urls;
