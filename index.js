@@ -27,6 +27,8 @@ function generateUrls() {
     return urls;
 }
 
+// urls = [urls[0], urls[1], urls[2]];
+
 function next_page() {
     var url = urls.shift();
     if (!url) {
@@ -51,7 +53,6 @@ function handle_page(url) {
     if (!url) {
         return;
     }
-    console.log('url', url);
     phantom.create(function(err, ph) {
         return ph.createPage(function(err, page) {
             return page.open(url, function(err, status) {
@@ -130,10 +131,23 @@ function handle_page(url) {
                             // var splits = imageUrl.split('/');
                             // var imageName = splits[splits.length - 1];
                             var imageName = result.title[0];
-
+                            var splits = imageUrl.split('.');
+                            var fileExtension = splits[splits.length - 1];
+                            var commonFileExtensions = ["png", "jpg", "jpeg", "gif"];
+                            var fileName = imageName + '.' + fileExtension;
                             download(imageUrl, imageName, function() {
-                                console.log('downloaded', imageName);
+                                console.log('downloaded', fileName);
                             });
+                            // if (commonFileExtensions.indexOf(fileExtension > -1) && fileExtension.length > 0) {
+                            //     download(imageUrl, fileName, function() {
+                            //         console.log('downloaded', fileName);
+                            //     });
+                            // } else {
+                            //     console.warn('no file extension', imageUrl);
+                            //     download(imageUrl, imageName, function() {
+                            //         console.log('downloaded', fileName);
+                            //     });
+                            // }
                         });
                         technologies.push(result);
                         setTimeout(function() {
@@ -150,11 +164,15 @@ function handle_page(url) {
                                 // });
 
                                 var writeStream = fs.createWriteStream("file.xls");
-                                var header = "Title" + "\t" + " Type" + "\t" + "Segment" + "\t" + "Image" + "\t" + "Description" + "\t" + "RelatedTechnologies" + " \n";
+                                var header = "Title" + "\t" + " Type" + "\t" + "Segments" + "\t" + "Image" + "\t" + "RelatedTechnologies" + "\t" + "Description" + "\n";
 
                                 writeStream.write(header);
+                                technologies.sort(function(tech1, tech2) {
+                                    return tech1.title[0] > tech2.title[0];
+                                });
+
                                 technologies.forEach(function(technology) {
-                                    var row = ToString(technology.title) + "\t" + ToString(technology.type) + "\t" + ToString(technology.segment) + "\t" + ToString(technology.image) + "\t" + ToString(technology.description) + "\t" + ToString(technology.relatedTechnologies) + "\n";
+                                    var row = ToString(technology.title) + "\t" + ToString(technology.type) + "\t" + ToString(technology.segment) + "\t" + ToString(technology.image) + "\t" + ToString(technology.relatedTechnologies) + "\t" + DescriptionToString(technology.description) + "\n";
                                     writeStream.write(row);
                                 });
                                 writeStream.end();
@@ -170,8 +188,30 @@ function handle_page(url) {
 
 function ToString(arr) {
     var s = "";
-    arr.forEach(function(item) {
-        s += item + ' ';
+    if (arr.length === 0) {
+        return "EMPTY";
+    }
+    arr.forEach(function(item, index, array) {
+        if (index < array.length - 1) {
+            s += item + ' | ';
+        } else {
+            s += item;
+        }
+    });
+    return s;
+}
+
+function DescriptionToString(arr) {
+    var s = "";
+    if (arr.length === 0) {
+        return "EMPTY";
+    }
+    arr.forEach(function(item, index, array) {
+        if (index < array.length - 1) {
+            s += item + ' \t ';
+        } else {
+            s += item;
+        }
     });
     return s;
 }
