@@ -2,10 +2,11 @@ var phantom = require('node-phantom');
 var fs = require('fs');
 var request = require('request');
 var json2xls = require('json2xls');
-
+var _ = require('lodash');
 var dir = './downloads/';
 var urls = generateUrls();
 var technologies = [];
+var excelbuilder = require('msexcel-builder');
 
 function download(uri, filename, callback) {
     request.head(uri, function(err, res, body) {
@@ -25,8 +26,6 @@ function generateUrls() {
     }
     return urls;
 }
-
-// urls = [urls[0]];
 
 function next_page() {
     var url = urls.shift();
@@ -121,7 +120,7 @@ function handle_page(url) {
                         };
                     }, function(err, result) {
                         //create downlaods directory if it doesnt exist
-                        console.log(result);
+                        console.log(url, result);
                         if (!fs.existsSync(dir)) {
                             fs.mkdirSync(dir);
                         }
@@ -137,15 +136,42 @@ function handle_page(url) {
                             });
                         });
                         technologies.push(result);
-                        if (urls.length === 0) {
-                            console.log('writing excel sheet...');
-                            var xls = json2xls(technologies);
-                            fs.writeFileSync('data.xlsx', xls, 'binary');
-                            // JSONToCSVConvertor(data, "Technologies Report", true);
-                        }
+                        setTimeout(function() {
+                            if (urls.length === 0) {
+                                console.log('writing excel sheet...');
+
+                                // var stream = fs.createWriteStream("my_file.txt");
+                                // stream.once('open', function(fd) {
+                                //     technologies.forEach(function(technology) {
+                                //         var row = technology.title + "\t" + technology.type + "\t" + technology.segment + "\t" + technology.image[0] + "\t" + technology.description[0] + "\t" + technology.relatedTechnologies + "\n";
+                                //         stream.write(row);
+                                //     });
+                                //     stream.end();
+                                // });
+
+                                var writeStream = fs.createWriteStream("file.xls");
+                                var header = "Title" + "\t" + " Type" + "\t" + "Segment" + "\t" + "Image" + "\t" + "Description" + "\t" + "RelatedTechnologies" + " \n";
+
+                                writeStream.write(header);
+                                technologies.forEach(function(technology) {
+                                    var row = ToString(technology.title) + "\t" + ToString(technology.type) + "\t" + ToString(technology.segment) + "\t" + ToString(technology.image) + "\t" + ToString(technology.description) + "\t" + ToString(technology.relatedTechnologies) + "\n";
+                                    writeStream.write(row);
+                                });
+                                writeStream.end();
+
+                            }
+                        }, 3000);
                     });
                 }, 3000);
             });
         });
     });
+}
+
+function ToString(arr) {
+    var s = "";
+    arr.forEach(function(item) {
+        s += item + ' ';
+    });
+    return s;
 }
