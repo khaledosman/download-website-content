@@ -4,9 +4,10 @@ var request = require('request');
 var json2xls = require('json2xls');
 var _ = require('lodash');
 var dir = './downloads/';
+var excelbuilder = require('msexcel-builder');
+
 var urls = generateUrls();
 var technologies = [];
-var excelbuilder = require('msexcel-builder');
 
 function download(uri, filename, callback) {
     request.head(uri, function(err, res, body) {
@@ -27,7 +28,7 @@ function generateUrls() {
     return urls;
 }
 
-// urls = [urls[0], urls[1], urls[2]];
+// urls = [urls[0], urls[1], urls[2], urls[3]];
 
 function next_page() {
     var url = urls.shift();
@@ -164,7 +165,7 @@ function handle_page(url) {
                                 // });
 
                                 var writeStream = fs.createWriteStream("file.xls");
-                                var header = "Title" + "\t" + " Type" + "\t" + "Segments" + "\t" + "Image" + "\t" + "RelatedTechnologies" + "\t" + "Description" + "\n";
+                                var header = "Title" + "\t" + " Type" + "\t" + "Segments" + "\t" + "Image" + "\t" + "Description" + "\t" + "RelatedTechnologies" + "\n";
 
                                 writeStream.write(header);
                                 technologies.sort(function(tech1, tech2) {
@@ -172,7 +173,7 @@ function handle_page(url) {
                                 });
 
                                 technologies.forEach(function(technology) {
-                                    var row = ToString(technology.title) + "\t" + ToString(technology.type) + "\t" + ToString(technology.segment) + "\t" + ToString(technology.image) + "\t" + ToString(technology.relatedTechnologies) + "\t" + DescriptionToString(technology.description) + "\n";
+                                    var row = ToString(technology.title) + "\t" + ToString(technology.type) + "\t" + ToString(technology.segment) + "\t" + ToString(technology.image) + "\t" + ToString(technology.description) + "\t" + RelatedToString(technology.relatedTechnologies) + "\n";
                                     writeStream.write(row);
                                 });
                                 writeStream.end();
@@ -201,14 +202,14 @@ function ToString(arr) {
     return s;
 }
 
-function DescriptionToString(arr) {
+function RelatedToString(arr) {
     var s = "";
     if (arr.length === 0) {
         return "EMPTY";
     }
     arr.forEach(function(item, index, array) {
         if (index < array.length - 1) {
-            s += item + ' \t ';
+            s += item + '\t';
         } else {
             s += item;
         }
