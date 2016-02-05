@@ -1,16 +1,16 @@
 var phantom = require('node-phantom');
 var fs = require('fs');
 var request = require('request');
+var json2xls = require('json2xls');
 
 var dir = './downloads/';
+var urls = generateUrls();
+var technologies = [];
 
 function download(uri, filename, callback) {
-
     request.head(uri, function(err, res, body) {
-
         console.log('downloading', 'content-type:', res.headers['content-type']);
         // console.log('content-length:', res.headers['content-length']);
-
         var r = request(uri).pipe(fs.createWriteStream(dir + filename));
         r.on('close', callback);
     });
@@ -26,7 +26,32 @@ function generateUrls() {
     return urls;
 }
 
-function openUrl(url) {
+// urls = [urls[0]];
+
+function next_page() {
+    var url = urls.shift();
+    if (!url) {
+        // phantom.exit(0);
+        console.log('DONE!');
+    }
+    setTimeout(function() {
+        handle_page(url);
+        if (url) {
+            setTimeout(next_page, 100);
+        }
+    }, 1000);
+}
+
+next_page();
+
+// urls.forEach(function(url) {
+//     handle_page(url);
+// });
+
+function handle_page(url) {
+    if (!url) {
+        return;
+    }
     console.log('url', url);
     phantom.create(function(err, ph) {
         return ph.createPage(function(err, page) {
@@ -97,29 +122,30 @@ function openUrl(url) {
                     }, function(err, result) {
                         //create downlaods directory if it doesnt exist
                         console.log(result);
-                        // if (!fs.existsSync(dir)) {
-                        //     fs.mkdirSync(dir);
-                        // }
-                        // //download images and save them in downloads folder
-                        // result.backgroundImages.forEach(function(imageUrl) {
-                        //     // console.log('imageUrl', imageUrl);
-                        //     var splits = imageUrl.split('/');
-                        //     var imageName = splits[splits.length - 1];
+                        if (!fs.existsSync(dir)) {
+                            fs.mkdirSync(dir);
+                        }
+                        //download images and save them in downloads folder
+                        result.image.forEach(function(imageUrl) {
+                            // console.log('imageUrl', imageUrl);
+                            // var splits = imageUrl.split('/');
+                            // var imageName = splits[splits.length - 1];
+                            var imageName = result.title[0];
 
-                        //     download(imageUrl, imageName, function() {
-                        //         console.log('downloaded', imageName);
-                        //     });
-                        // });
+                            download(imageUrl, imageName, function() {
+                                console.log('downloaded', imageName);
+                            });
+                        });
+                        technologies.push(result);
+                        if (urls.length === 0) {
+                            console.log('writing excel sheet...');
+                            var xls = json2xls(technologies);
+                            fs.writeFileSync('data.xlsx', xls, 'binary');
+                            // JSONToCSVConvertor(data, "Technologies Report", true);
+                        }
                     });
-                }, 1000);
+                }, 3000);
             });
         });
     });
 }
-
-
-var urls = generateUrls();
-
-// urls.forEach(function(url) {
-openUrl(urls[0]);
-// });
