@@ -9,7 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "cheerio": "^0.20.0",
+    "cheerio": "^0.22.0",
     "crawler": "^1.2.1",
     "fs": "0.0.2",
     "json2xls": "^0.1.1",
