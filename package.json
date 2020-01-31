@@ -16,7 +16,7 @@
     "lodash": "^4.2.1",
     "msexcel-builder": "0.0.2",
     "node-phantom": "^0.2.5",
-    "phantomjs": "^1.9.19",
+    "phantomjs": "^2.1.7",
     "request": "^2.69.0",
     "simplecrawler": "^0.6.0",
     "socket.io": "^1.4.5",
